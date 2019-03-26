@@ -20,7 +20,7 @@ public extension Sequence {
   ///     (1..<6).scan(0, +) // [0, 1, 3, 6, 10, 15]
   ///
   /// - Complexity: O(n)
-  public func scan<ResultElement>(
+  func scan<ResultElement>(
     _ initial: ResultElement,
     _ nextPartialResult: (ResultElement, Element) -> ResultElement
   ) -> [ResultElement] {
@@ -43,7 +43,7 @@ public extension LazySequenceProtocol {
   ///     Array((1...).lazy.scan(0, +).prefix(6)) // [0, 1, 3, 6, 10, 15]
   ///
   /// - Complexity: O(1)
-  public func scan<ResultElement>(
+  func scan<ResultElement>(
     _ initial: ResultElement,
     _ nextPartialResult: @escaping (ResultElement, Element) -> ResultElement
   ) -> LazyScanSequence<Self, ResultElement> {
