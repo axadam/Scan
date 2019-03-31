@@ -73,16 +73,21 @@ public struct LazyScanSequence<Base: Sequence, ResultElement>
 public struct LazyScanIterator<Base : IteratorProtocol, ResultElement>
   : IteratorProtocol {
   mutating public func next() -> ResultElement? {
-    return nextElement.map { result in
-      nextElement = base.next().map { nextPartialResult(result, $0) }
-      return result
+    if first {
+        first = false
+        return nextElement               // if first time pass through initial value
     }
+    guard let prev = nextElement else { return nil }
+    guard let baseNext = base.next() else { return nil }
+    nextElement = nextPartialResult(prev,baseNext)
+    return nextElement
   }
   fileprivate init(nextElement: ResultElement?, base: Base, nextPartialResult: @escaping (ResultElement, Base.Element) -> ResultElement) {
     self.nextElement = nextElement
     self.base = base
     self.nextPartialResult = nextPartialResult
   }
+  private var first: Bool = true          // In first iteration we pass through initial value
   private var nextElement: ResultElement? // The next result of next().
   private var base: Base                  // The underlying iterator.
   private let nextPartialResult: (ResultElement, Base.Element) -> ResultElement
