@@ -20,6 +20,7 @@ public extension Sequence {
   ///     (1..<6).scan(0, +) // [0, 1, 3, 6, 10, 15]
   ///
   /// - Complexity: O(n)
+  @inlinable
   func scan<ResultElement>(
     _ initial: ResultElement,
     _ nextPartialResult: (ResultElement, Element) -> ResultElement
@@ -43,6 +44,7 @@ public extension LazySequenceProtocol {
   ///     Array((1...).lazy.scan(0, +).prefix(6)) // [0, 1, 3, 6, 10, 15]
   ///
   /// - Complexity: O(1)
+  @inlinable
   func scan<ResultElement>(
     _ initial: ResultElement,
     _ nextPartialResult: @escaping (ResultElement, Element) -> ResultElement
@@ -55,23 +57,29 @@ public extension LazySequenceProtocol {
 public struct LazyScanSequence<Base: Sequence, ResultElement>
   : LazySequenceProtocol // Chained operations on self are lazy, too
 {
+  @inlinable
   public func makeIterator() -> LazyScanIterator<Base.Iterator, ResultElement> {
     return LazyScanIterator(
         nextElement: initial, base: base.makeIterator(), nextPartialResult: nextPartialResult)
   }
-  fileprivate init(initial: ResultElement, base: Base, nextPartialResult: @escaping (ResultElement, Base.Element) -> ResultElement) {
+  @inlinable
+  internal init(initial: ResultElement, base: Base, nextPartialResult: @escaping (ResultElement, Base.Element) -> ResultElement) {
     self.initial = initial
     self.base = base
     self.nextPartialResult = nextPartialResult
   }
-  private let initial: ResultElement
-  private let base: Base
-  private let nextPartialResult:
+  @usableFromInline
+  internal let initial: ResultElement
+  @usableFromInline
+  internal let base: Base
+  @usableFromInline
+  internal let nextPartialResult:
     (ResultElement, Base.Element) -> ResultElement
 }
 
 public struct LazyScanIterator<Base : IteratorProtocol, ResultElement>
   : IteratorProtocol {
+  @inlinable
   mutating public func next() -> ResultElement? {
     if first {
         first = false
@@ -82,14 +90,19 @@ public struct LazyScanIterator<Base : IteratorProtocol, ResultElement>
     nextElement = nextPartialResult(prev,baseNext)
     return nextElement
   }
-  fileprivate init(nextElement: ResultElement?, base: Base, nextPartialResult: @escaping (ResultElement, Base.Element) -> ResultElement) {
+  @inlinable
+  internal init(nextElement: ResultElement?, base: Base, nextPartialResult: @escaping (ResultElement, Base.Element) -> ResultElement) {
     self.nextElement = nextElement
     self.base = base
     self.nextPartialResult = nextPartialResult
   }
-  private var first: Bool = true          // In first iteration we pass through initial value
-  private var nextElement: ResultElement? // The next result of next().
-  private var base: Base                  // The underlying iterator.
-  private let nextPartialResult: (ResultElement, Base.Element) -> ResultElement
+  @usableFromInline
+  internal var first: Bool = true          // In first iteration we pass through initial value
+  @usableFromInline
+  internal var nextElement: ResultElement? // The next result of next().
+  @usableFromInline
+  internal var base: Base                  // The underlying iterator.
+  @usableFromInline
+  internal let nextPartialResult: (ResultElement, Base.Element) -> ResultElement
 }
 
