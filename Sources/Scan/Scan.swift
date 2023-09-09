@@ -7,8 +7,6 @@
 //  Apple's Swift documentation in LazySequence.swift
 //
 
-import Foundation
-
 public extension Sequence {
   /// Returns an array containing the results of
   ///
